@@ -32,7 +32,7 @@ class Home1 extends React.Component {
     handleCheckbox = (index) => {
         const {todos} = this.state;
         todos[index].done = !todos[index].done;
-       this.db.child(todos[index].id).update({
+       this.db.child(index).update({
          done: todos[index].done
        })
           
@@ -153,7 +153,7 @@ class Home1 extends React.Component {
                  textDecoration: (item.done) ? 'line-through' : 'none',
                }}
                >
-                 {item.text}/{key}
+                 {item.text}
                </span>
                
                <button
