@@ -16,20 +16,23 @@ class Home1 extends React.Component {
       this.db.on('value',(snapshot)=>{
         
         // if this list not exist
-        (snapshot.val() === null) ? (this.setState({todos:[]})) :
+        (snapshot.val() === null) ? (
+        console.log('TODOS TODOS: ', snapshot.val())
+
+        ) :
        ( this.setState({
           todos: snapshot.val()
         }))
+        console.log('TODOS TODOS: ', snapshot.val());
         
       })
-      console.log('STATE TODOS: ', this.db);
       
     }
     //method to checkbox
     handleCheckbox = (index) => {
         const {todos} = this.state;
         todos[index].done = !todos[index].done;
-       this.db.child(index).update({
+       this.db.child(todos[index].id).update({
          done: todos[index].done
        })
           
@@ -53,8 +56,8 @@ class Home1 extends React.Component {
                   done:false,
                 },
               ...todos],
-              }).then(() => {
-                console.log('ENTRO');
+              }).then((key) => {
+                console.log('Que retorna el set: ',key.va);
                   
               }).catch((err) => {
                   console.error();
@@ -66,10 +69,8 @@ class Home1 extends React.Component {
               todo: '',
               todos: [
                 {
-                  id: todos.length,
                   text: event.currentTarget.todo.value,
                   done:false,
-                  user: app.auth().currentUser.email,
                 },
                 ...todos
               ]
@@ -83,8 +84,14 @@ class Home1 extends React.Component {
     }
     handleRemove = (index) => {
         const {todos} = this.state;
-        this.db.child(index).remove();
+        app.database().ref('users/'+ app.auth().currentUser.email.split('@')[0]).update({
+          todos: [
+            ...todos.slice(0,index),
+            ...todos.slice(index+1),
+          ],
+        })
 
+        
         this.setState({
           todo: '',
           todos: [
@@ -92,13 +99,12 @@ class Home1 extends React.Component {
             ...todos.slice(index+1),
           ],
         });  
-       
         
         
         
-    }
-    render(){
-      const {todo, todos} = this.state;
+      }
+      render(){
+        const {todo, todos} = this.state;
         return(
           
           <div className="App">
@@ -147,7 +153,7 @@ class Home1 extends React.Component {
                  textDecoration: (item.done) ? 'line-through' : 'none',
                }}
                >
-                 {item.text}
+                 {item.text}/{key}
                </span>
                
                <button
